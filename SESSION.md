@@ -172,7 +172,7 @@ You can read more about other Web API methods on [the official documentation for
 
 
 #### Message Actions
-Message Actions are another form of interactivity which share a lot in common with Interactive Messages (including the same Request URL). These are essentially commands that can be automatically called from any menu via the context menu (`...`) and mapped to a function in your interactive handler.
+Message Actions are another form of interactivity which share a lot in common with Interactive Messages (including the same Request URL). These are essentially commands that can be automatically called from any message via the context menu (`...`) and mapped to a function in your interactive handler.
 
 To set them up navigate over to "Interactive Components" in your Slack App Dashboard and click "Create New Action". When your action is called by a user, a payload will be sent to your route with the `type` `message_action` and a `callback_id` you set up in the dashboard.
 
@@ -190,7 +190,7 @@ Slack Type | HTML | Example Case
 --- | --- | ---
 text | `<input type="text" />` | A story slug
 textarea | `<textarea></textarea>` | A longer description
-select | `<select></select>` | A type
+select | `A` | A type
 
 The first thing to know about dialogs is that they require a `trigger_id` in order to be called. This Id tells Slack which user to serve the dialog to and serves as spam protection. You cannot open a dialog without the user taking some sort of action to call for it.
 
@@ -217,21 +217,63 @@ You can read more about Events and see all the different things to listen for on
 
 ***
 
-### What are other things to keep in mind?
+### What are the things that cause hours of needless debugging?
 
 #### Understanding Message Ids
 
+Slack uses timestamps as a unique identifier for each message. Essentially the timestamps are so precise (or so the thinking goes) that no two messages will be sent (or processed) at the same time. In my experience this is true. You'll see this unique represented as `message_ts` in payloads.
+
 #### Finding Channel Ids
+
+Channel Ids are the most important piece of information that is also impossible to find. In most payloads you'll be able to find it either at the key of `channel_id` or at the key of `channel.id`. Unfortunately, when you get started you're not receiving payloads.
+
+The easiest way to find it is to go to your Slack web interface (as in [`http://srccon2018frontend.slack.com/`](http://srccon2018frontend.slack.com/)) and navigate to a channel page. That should take you to a URL like `https://srccon2018frontend.slack.com/messages/CBCSRDZ1S/`. That last part (the `CBCSRDZ1S`) is the channel Id.
+
 
 #### Inconsistent Payload Schemes & Documentation
 
+Slack payloads...suck.
+
+Take a look at the [example directory](app/examples) to see for yourself. Each type of interaction (every time you have to provide a separate Request URL), that payload arrives differently. The documentation is also often unclear as to what the full payload will look like. One of the payloads even come in as a serialized JSON string because... reasons I guess?
+
+My general rule of thumb is that if you're unsure of what a payload looks like: just `print()` the whole thing so you can figure out the very complicated path to a particular `message_ts`.
+
+I asked Slack about these inconsistencies on Twitter. Their answer?
+
+![Slack Payloads](docs/source/img/slack-payloads.png)
 
 #### Difference Between Token Types
 
+Slack essentially has three tokens to worry about when creating internal apps:
+
+- The Verification Token
+- The App Token
+- The Bot Token
+
+As I said in the [Authorization](#authorization), the verification token is used to prove that incoming requests are actually coming from Slack. You can find this in your Slack App Dashboard under "Basic Information".
+
+The App and Bot Tokens are essentially the same. Like seriously. If someone can tell me when to use which one I'd appreciate it.
+
+There are some others but I never use them. You can read up about them on [the official documentation](https://api.slack.com/docs/token-types).
 
 #### Working With Collaborators
 
+Developing by yourself is no fun. If you want to give other team members access to the Slack App Dashboard for your app, you can do that in "Collaborators". Collaborators will have full access to add functionality and change Request URLs.
 
 #### Making The App Look Nice
 
+Don't be this person...
+
+![No Design](docs/source/img/no-design.png)
+
+Give your app some looks. At least steal an icon from the internet. To change the app's display name and icon, scroll down to "Display Information" in the "Basic Information" tab of the your Slack App Dashboard.
+
 #### Providing Proper Feedback
+
+Slack can do 99% of the hard front end work for you. One essentially part of front-end design that it doesn't do though is proper user feedback: the concept that every action taken by a user should have a clearly visible outcome to tell the user that their action was registered from the system.
+
+How to do this can vary from system to system and action to action but some easy ways are sending them ephemeral messages (messages that only they can see) using the [`chat.postEphemeral`](https://api.slack.com/methods/chat.postEphemeral) Web API method.
+
+Another key way to provide proper feedback with interactive messages is changing them someway. Maybe a button changes color from grey to green, or the selected option changes. You can do this using the [`chat.update`](https://api.slack.com/methods/chat.update) Web API method.
+
+There's a whole host of other great advice from Slack on how to make your Slack Apps more usable and inviting to users in [the documentation](https://api.slack.com/best-practices).
