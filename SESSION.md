@@ -153,7 +153,7 @@ There are two types of interactions supported:
 - Buttons
 - Select Dropdowns
 
-These interactibles are treated just like any other message attachments, and can be combined with those to make one complex interactive message posted with the same API call as a regular method. Check out [request_made.py](app/functions/request_made.py#L14-L56) for an example of this.
+These interactibles are treated just like any other message attachments, and can be combined with them to make one complex interactive message posted with the same API call as a basic message. Check out [request_made.py](app/functions/request_made.py#L14-L56) for an example of this.
 
 You'll notice each interactible has a callback_id you provide. That's important because all button presses and dropdown selections created by your app go to one route. These Ids tell you which button was pressed. See the route for the interactive dropdown menu created above in [the flask app file](app/app.py#L59-L90), specifically [these lines](app/app.py#L75-L80).
 
@@ -188,17 +188,17 @@ Dialogs can take three kinds of input which share HTML equivalents:
 
 Slack Type | HTML | Example Case
 --- | --- | ---
-text | `<input type="text" />` | A story slug
+text | `<input type="text" />` | A title
 textarea | `<textarea></textarea>` | A longer description
-select | `A` | A type
+select | `<select></select>` | A type
 
 The first thing to know about dialogs is that they require a `trigger_id` in order to be called. This Id tells Slack which user to serve the dialog to and serves as spam protection. You cannot open a dialog without the user taking some sort of action to call for it.
 
-In this app, when users call the Slash command `new-request`, they will be given this form to fill out:
+In this app, when users call the Slash command `graphic`, they will be given this form to fill out:
 
 ![Request Form](docs/source/img/request-form.png)
 
-Check out how this form was created in [new_request.py](app/new_request.py). Just like actions, dialogs take a `callback_id` which you can reference in your route logic. Check out [the flask app file](app/app.py#L70-L73) for that.
+Check out how this form was created in [new_request.py](app/functions/new_request.py). Just like actions, dialogs take a `callback_id` which you can reference in your route logic. Check out [the flask app file](app/app.py#L70-L73) for that.
 
 You can read more about Dialog Submissions on [the official documentation for it](https://api.slack.com/dialogs).
 
@@ -252,7 +252,7 @@ Slack essentially has three tokens to worry about when creating internal apps:
 
 As I said in the [Authorization](#authorization), the verification token is used to prove that incoming requests are actually coming from Slack. You can find this in your Slack App Dashboard under "Basic Information".
 
-The App and Bot Tokens are essentially the same. Like seriously. If someone can tell me when to use which one I'd appreciate it.
+The App and Bot Tokens are essentially the same for the purposes of internal apps. You'll only see a Bot Token if you add a bot user to your app.
 
 There are some others but I never use them. You can read up about them on [the official documentation](https://api.slack.com/docs/token-types).
 
@@ -270,9 +270,9 @@ Give your app some looks. At least steal an icon from the internet. To change th
 
 #### Providing Proper Feedback
 
-Slack can do 99% of the hard front end work for you. One essentially part of front-end design that it doesn't do though is proper user feedback: the concept that every action taken by a user should have a clearly visible outcome to tell the user that their action was registered from the system.
+Slack can do 90% of the tedious front-end work for you. One essential part of front-end design that it doesn't do though is proper user feedback: the concept that every action taken by a user should have a clearly visible outcome to tell the user that their action was registered from the system.
 
-How to do this can vary from system to system and action to action but some easy ways are sending them ephemeral messages (messages that only they can see) using the [`chat.postEphemeral`](https://api.slack.com/methods/chat.postEphemeral) Web API method.
+How to do this can vary from system to system and action to action, but some easy ways are sending them ephemeral messages (messages that only they can see) using the [`chat.postEphemeral`](https://api.slack.com/methods/chat.postEphemeral) Web API method.
 
 Another key way to provide proper feedback with interactive messages is changing them someway. Maybe a button changes color from grey to green, or the selected option changes. You can do this using the [`chat.update`](https://api.slack.com/methods/chat.update) Web API method.
 
