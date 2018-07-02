@@ -94,6 +94,10 @@ def event_starred(event):
     """
     Message had a star added to it event webhook.
     """
+    # Authorize the request
+    if not authorize(payload["token"]):
+        return (None, 403, None)
+        
     item_starred = event.get("event").get("item")
 
     url = item_starred.get("message").get("permalink")
