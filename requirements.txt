@@ -12,7 +12,7 @@ macholib==1.5.1
 matplotlib==1.3.1
 mccabe==0.6.1
 modulegraph==0.10.4
-numpy==1.8.0rc1
+numpy==1.22.0rc1
 pkginfo==1.4.2
 py2app==0.7.3
 pycodestyle==2.3.1
